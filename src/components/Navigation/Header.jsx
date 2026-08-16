@@ -1,9 +1,9 @@
 import React from 'react';
 import { useStudy } from '../../context/StudyContext';
-import { ChevronLeft, ChevronRight, Moon, Sun, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Moon, Sun, Search, Download } from 'lucide-react';
 
 export const Header = ({ onOpenSearch }) => {
-  const { selectedDate, setSelectedDate, todayDate, darkMode, toggleDarkMode } = useStudy();
+  const { selectedDate, setSelectedDate, todayDate, darkMode, toggleDarkMode, exportDataJSON } = useStudy();
 
   // Date shifting
   const shiftDate = (days) => {
@@ -72,9 +72,16 @@ export const Header = ({ onOpenSearch }) => {
         {/* Actions */}
         <div className="flex items-center gap-1">
           <button
+            onClick={exportDataJSON}
+            className="p-1.5 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 rounded-lg active-touch"
+            title="Download Data Backup"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+          <button
             onClick={onOpenSearch}
             className="p-1.5 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 rounded-lg active-touch"
-            title="Search"
+            title="Search & Calendar"
           >
             <Search className="w-4 h-4" />
           </button>

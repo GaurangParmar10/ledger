@@ -235,6 +235,31 @@ export const StudyProvider = ({ children }) => {
     }));
   };
 
+  // 7b. Decrement Revision (Misclick correction)
+  const decrementRevision = (chapterId) => {
+    setRevisions(prevRevs => {
+      const revIndex = prevRevs.findIndex(r => r.chapterId === chapterId);
+      const remainingRevs = revIndex !== -1 ? prevRevs.filter((_, idx) => idx !== revIndex) : prevRevs;
+      const remainingForChap = remainingRevs.filter(r => r.chapterId === chapterId);
+      const newLastRevDate = remainingForChap.length > 0 ? remainingForChap[0].date : null;
+
+      setChapters(prevChaps => prevChaps.map(ch => {
+        if (ch.id === chapterId) {
+          const currentCount = ch.revisionCount || 0;
+          const newCount = Math.max(0, currentCount - 1);
+          return {
+            ...ch,
+            revisionCount: newCount,
+            lastRevisionDate: newLastRevDate
+          };
+        }
+        return ch;
+      }));
+
+      return remainingRevs;
+    });
+  };
+
   // 8. Log Study Session (Lecture / Self Study)
   const logStudySession = ({ chapterId, type, durationMinutes, notes = '', link = '', date = selectedDate }) => {
     const newSession = {
@@ -262,6 +287,28 @@ export const StudyProvider = ({ children }) => {
       }
       return ch;
     }));
+  };
+
+  // 8b. Delete Study Session
+  const deleteStudySession = (sessionId) => {
+    setSessions(prevSessions => {
+      const session = prevSessions.find(s => s.id === sessionId);
+      if (!session) return prevSessions;
+
+      setChapters(prevChaps => prevChaps.map(ch => {
+        if (ch.id === session.chapterId) {
+          const dur = session.durationMinutes || 0;
+          return {
+            ...ch,
+            totalLectureMinutes: session.type === 'Lecture' ? Math.max(0, (ch.totalLectureMinutes || 0) - dur) : (ch.totalLectureMinutes || 0),
+            totalSelfStudyMinutes: session.type === 'Self Study' ? Math.max(0, (ch.totalSelfStudyMinutes || 0) - dur) : (ch.totalSelfStudyMinutes || 0)
+          };
+        }
+        return ch;
+      }));
+
+      return prevSessions.filter(s => s.id !== sessionId);
+    });
   };
 
   // 9. Save Daily Notes / Reflection
@@ -435,7 +482,9 @@ export const StudyProvider = ({ children }) => {
       deleteTarget,
       moveTargetToDate,
       addRevision,
+      decrementRevision,
       logStudySession,
+      deleteStudySession,
       saveDailyNotes,
       addDoubt,
       toggleDoubtSolved,

@@ -8,6 +8,7 @@ export const SyllabusTracker = () => {
     chapters,
     updateChapterStatus,
     addRevision,
+    decrementRevision,
     selectedDate
   } = useStudy();
 
@@ -97,14 +98,24 @@ export const SyllabusTracker = () => {
                                 <p className={`text-xs font-bold ${chap.status === 'Completed' ? 'line-through opacity-60' : ''}`}>
                                   {chap.num ? `${chap.num}. ` : ''}{chap.name}
                                 </p>
-                                <div className="flex items-center gap-2 mt-1 text-[10px] text-neutral-400">
+                                <div className="flex items-center gap-1.5 mt-1 text-[10px] text-neutral-400">
                                   <span>Revision × {revCount}</span>
                                   <button
                                     onClick={() => addRevision({ chapterId: chap.id, revisionType: `Rev ${revCount + 1}`, date: selectedDate })}
                                     className="px-1.5 py-0.5 rounded border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold active-touch"
+                                    title="Increase revision count"
                                   >
                                     + REVISION
                                   </button>
+                                  {revCount > 0 && (
+                                    <button
+                                      onClick={() => decrementRevision(chap.id)}
+                                      className="px-1.5 py-0.5 rounded border border-neutral-300 dark:border-neutral-700 font-bold text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 active-touch"
+                                      title="Undo / Decrement revision misclick"
+                                    >
+                                      -
+                                    </button>
+                                  )}
                                 </div>
                               </div>
 

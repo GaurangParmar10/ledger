@@ -3,7 +3,7 @@ import { useStudy } from '../../context/StudyContext';
 import { Search } from 'lucide-react';
 
 export const RevisionTracker = () => {
-  const { subjects, chapters, revisions, addRevision, selectedDate } = useStudy();
+  const { subjects, chapters, revisions, addRevision, decrementRevision, selectedDate } = useStudy();
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -89,17 +89,28 @@ export const RevisionTracker = () => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-black">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-mono font-black mr-1">
                   Revision × {count}
                 </span>
 
                 <button
                   onClick={() => addRevision({ chapterId: chap.id, revisionType: `Rev ${count + 1}`, date: selectedDate })}
                   className="px-2.5 py-1 rounded text-xs font-extrabold border border-neutral-900 bg-neutral-900 text-white dark:border-neutral-100 dark:bg-neutral-100 dark:text-neutral-900 active-touch"
+                  title="Increase revision count"
                 >
                   + REVISION
                 </button>
+
+                {count > 0 && (
+                  <button
+                    onClick={() => decrementRevision(chap.id)}
+                    className="px-2 py-1 rounded text-xs font-bold border border-neutral-300 dark:border-neutral-700 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 active-touch"
+                    title="Undo / Decrement revision misclick"
+                  >
+                    -
+                  </button>
+                )}
               </div>
             </div>
           );

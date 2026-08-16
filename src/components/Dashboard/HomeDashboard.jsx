@@ -8,7 +8,8 @@ import {
   ChevronDown,
   ChevronUp,
   X,
-  BookOpen
+  BookOpen,
+  Trash2
 } from 'lucide-react';
 
 export const HomeDashboard = () => {
@@ -21,8 +22,11 @@ export const HomeDashboard = () => {
     revisions,
     addDailyTarget,
     toggleTargetStatus,
+    deleteTarget,
     addRevision,
+    decrementRevision,
     logStudySession,
+    deleteStudySession,
     dailyNotes,
     saveDailyNotes
   } = useStudy();
@@ -237,30 +241,50 @@ export const HomeDashboard = () => {
                     </p>
 
                     {/* Revision Counter & 1-Tap Revision trigger */}
-                    <div className="flex items-center gap-2 mt-1.5 text-[10px]">
+                    <div className="flex items-center gap-1.5 mt-1.5 text-[10px]">
                       <span className="font-mono text-neutral-500">
                         Revision × {revCount}
                       </span>
                       <button
                         onClick={() => addRevision({ chapterId: target.chapterId, revisionType: `Rev ${revCount + 1}`, date: selectedDate })}
                         className="px-1.5 py-0.5 rounded border border-neutral-300 dark:border-neutral-700 font-bold hover:bg-neutral-100 dark:hover:bg-neutral-800 active-touch"
+                        title="Increase revision count"
                       >
                         + REVISION
                       </button>
+                      {revCount > 0 && (
+                        <button
+                          onClick={() => decrementRevision(target.chapterId)}
+                          className="px-1.5 py-0.5 rounded border border-neutral-300 dark:border-neutral-700 font-bold text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 active-touch"
+                          title="Undo / Decrement revision misclick"
+                        >
+                          -
+                        </button>
+                      )}
                     </div>
                   </div>
 
-                  {/* 1-TAP DONE BUTTON */}
-                  <button
-                    onClick={() => toggleTargetStatus(target.id)}
-                    className={`px-3 py-1.5 rounded text-xs font-extrabold border active-touch ${
-                      target.completed
-                        ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 border-neutral-900'
-                        : 'border-neutral-400 text-neutral-800 dark:text-neutral-200 hover:border-neutral-900 dark:hover:border-neutral-100'
-                    }`}
-                  >
-                    {target.completed ? '✓ DONE' : 'DONE'}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* 1-TAP DONE BUTTON */}
+                    <button
+                      onClick={() => toggleTargetStatus(target.id)}
+                      className={`px-3 py-1.5 rounded text-xs font-extrabold border active-touch ${
+                        target.completed
+                          ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 border-neutral-900'
+                          : 'border-neutral-400 text-neutral-800 dark:text-neutral-200 hover:border-neutral-900 dark:hover:border-neutral-100'
+                      }`}
+                    >
+                      {target.completed ? '✓ DONE' : 'DONE'}
+                    </button>
+
+                    <button
+                      onClick={() => deleteTarget(target.id)}
+                      className="p-1.5 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+                      title="Delete target"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -349,6 +373,25 @@ export const HomeDashboard = () => {
               </button>
             </div>
           </form>
+        )}
+
+        {/* Logged Sessions List with Delete Button */}
+        {dateSessions.length > 0 && (
+          <div className="space-y-1.5 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+            <span className="text-[10px] font-black uppercase text-neutral-400 block">Logged Sessions</span>
+            {dateSessions.map(s => (
+              <div key={s.id} className="flex items-center justify-between text-xs p-2 rounded bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
+                <span className="font-bold">{s.type}: {formatTime(s.durationMinutes)}</span>
+                <button
+                  onClick={() => deleteStudySession(s.id)}
+                  className="text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 p-1"
+                  title="Delete session"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </section>
 
